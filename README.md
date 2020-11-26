@@ -1,70 +1,201 @@
-# Getting Started with Create React App
+# React 项目 --- 开发环境的配置
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 初始化项目
 
-## Available Scripts
+- 下载脚手架： npm i -g create-react-app
+- 使用脚手假初始化项目： create-react-app 项目名
+- 切换到项目： cd 项目名
+- 启动项目： npm start
+- 删除一些不必要的文件
 
-In the project directory, you can run:
+## ant-design 配置
 
-### `yarn start`
+- 下载 ant-design： npm i antd
+- 配置按需加载
+  1. 下载 npm i react-app-rewired customize-cra babel-plugin-import
+  2. 修改 package.json
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```javascript
+"scripts": {
+  "start": "react-app-rewired start",
+  "build": "react-app-rewired build",
+  "test": "react-app-rewired test"
+}
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+3. 项目根目录创建一个 config-overrides.js 用于修改默认配置。
 
-### `yarn test`
+```javascript
+const { override, fixBabelImports } = require('customize-cra')
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+module.exports = override(
+  fixBabelImports('import', {
+    libraryName: 'antd',
+    libraryDirectory: 'es',
+    style: 'css',
+  })
+)
+```
 
-### `yarn build`
+4. 启动项目测试按需加载
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 自定义 antd 主题
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- npm i less@2.7.3 less-loader5.0.0 --save (版本不要错了。。。,如果不行单独加载这两个, 先下载 less)
+- 修改 config-overrides.js 文件
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```javascript
+const { override, fixBabelImports, addLessLoader } = require('customize-cra')
 
-### `yarn eject`
+module.exports = override(
+  fixBabelImports('import', {
+    libraryName: 'antd',
+    libraryDirectory: 'es',
+    style: true, // 设置为true
+  }),
+  // 添加loader
+  addLessLoader({
+    javascriptEnabled: true,
+    modifyVars: { '@primary-color': 'red' }, // 修改主题颜色
+  })
+)
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## 配置 redux
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- 下载： npm i react-redux redux redux-thunk
+- 创建 redux 文件夹 文件目录
+  ```
+  redux -|
+    action.js  -- 定义了一些操作类型，告诉store自己是干什么的
+    store.js -- 一切操作还是基于Store 的。类似于中央集权
+    reducers.js -- 操作state
+    action_types.js -- 这写常量一般都定义在actionTpye文件中
+  ```
+- action.js
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+  ```javascript
+  import { ADDCOUNT, MINUSCOUNT, SETNAME } from './action_types'
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+  //包含所有的action creator
+  export const addCountCreater = (count) => ({ type: ADDCOUNT, data: count })
+  export const minusCountCreater = (count) => ({
+    type: MINUSCOUNT,
+    data: count,
+  })
+  export const addCountAsync = (count) => {
+    return (dispatch) => {
+      setTimeout(() => {
+        dispatch(addCountCreater(count))
+      }, 2000)
+    }
+  }
 
-## Learn More
+  // 操作姓名
+  export const setNameCreater = (name) => ({ type: SETNAME, data: name })
+  ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- store.js
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+  ```javascript
+  import { createStore, applyMiddleware } from 'redux'
+  import { finalReducer } from './reducers'
+  import thunk from 'redux-thunk'
+  //生成store对象
+  const store = createStore(finalReducer, applyMiddleware(thunk)) //内部会第一次调用reducer函数，得到初始state
 
-### Code Splitting
+  export default store
+  ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- reducers.js
 
-### Analyzing the Bundle Size
+  ```javascript
+  //包含n个reducer函数的模块
+  import { ADDCOUNT, MINUSCOUNT, SETNAME } from './action_types'
+  import { combineReducers } from 'redux'
+  function addCount(state = 0, action) {
+    //形参默认值
+    console.log('reducers----' + action.data)
+    let newState
+    switch (action.type) {
+      case ADDCOUNT:
+        newState = state + action.data
+        return newState
+      case MINUSCOUNT:
+        newState = state - action.data
+        return newState
+      default:
+        return state
+    }
+  }
+  function setName(state = '黄万通', action) {
+    switch (action.type) {
+      case SETNAME:
+        return action.data
+      default:
+        return state
+    }
+  }
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+  export const finalReducer = combineReducers({
+    addCount,
+    setName,
+  })
+  ```
 
-### Making a Progressive Web App
+- action_types
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+  ```javascript
+  export const ADDCOUNT = 'addCount'
+  export const MINUSCOUNT = 'minusCount'
+  export const SETNAME = 'setName'
+  ```
 
-### Advanced Configuration
+- 在 index.js 里添加一些代码
+  ```javascript
+  import { Provider } from 'react-redux' // 导入react-redux为我们准备好的容器
+  import store from './redux/store' // 导入store
+  ReactDOM.render(
+    /* 使用Provider把App包裹起来并把store传过去 */
+    <Provider store={store}>
+      <App />
+    </Provider>,
+    document.getElementById('root')
+  )
+  ```
+- 创建容器组件文件夹 containers (count.jsx)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+  ```javascript
+  // 导入react
+  import React from 'react'
+  // 导入react-redux
+  import { connect } from 'react-redux'
+  // 导入action方法
+  import {
+    addCountCreater,
+    addCountAsync,
+    minusCountCreater,
+    setNameCreater,
+  } from '../redux/action'
+  class Count extends React.Component {
+    // 测试是否接收到属性
+    componentWillMount() {
+      console.log(this.props)
+    }
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+    render() {
+      // 获取count状态
+      const { count } = this.props
+      return <div>{count}</div>
+    }
+  }
+  // 这一步是把普通组件变成容器组件的关键
+  export default connect(
+    // 使用connect方法，它接收的参数就是传到state中的状态
+    (state) => ({
+      count: state.addCount,
+      name: state.setName,
+    }),
+    { addCountCreater, addCountAsync, minusCountCreater, setNameCreater }
+  )(Count) // 把Count组件挂载上去
+  ```
