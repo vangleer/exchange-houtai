@@ -1,11 +1,19 @@
 import React,{Component} from 'react'
-import { Form, Icon, Input,Button,message } from 'antd';
+import { Form, Icon, Input,Button,message,Row,Col } from 'antd';
 import '../css/login.less'
 import logo from '../static/imgs/logo.png'
+import {BASE_URL} from '../config/index'
+import {reqLogin} from '../service/service.js'
 const {Item} = Form
 class Login extends Component {
+  state = {
+    captureImg: `${BASE_URL}/Admin/Pub/Login/getVerifyCode?time=${Date.now()}`,
+    isLogin:false
+  }
   componentDidMount() {
-    console.log(this.props)
+    if(localStorage.getItem('token')) {
+      this.props.history.replace('/admin')
+    }
   }
   // 验证密码的函数
   pwdValidator = (item,value,callback) => {
@@ -23,12 +31,26 @@ class Login extends Component {
     // 阻止表单提交默认事件
     e.preventDefault()
     // form.validateFields 进行表单的最终校验
-    this.props.form.validateFields((err, values) => {
+    this.props.form.validateFields(async (err, values) => {
       // 如果没有错误
       if (!err) {
         // 在这里发起服务器请求
-        message.success('登录成功!')
+        const res = await reqLogin({...values})
+        if(res.status === 1) {
+          // 保存 token
+          localStorage.setItem('token',res.data.token)
+          // 跳转
+          this.props.history.replace('/admin')
+        } else {
+          message.error(res.msg)
+        }
+        
       } 
+    })
+  }
+  getCaptureImg = () => {
+    this.setState({
+      captureImg: `${BASE_URL}/Admin/Pub/Login/getVerifyCode?time=${Date.now()}`
     })
   }
   render() {
@@ -61,6 +83,23 @@ class Login extends Component {
                   placeholder="密码"
                 />
               )}
+            </Item>
+           
+            <Item >
+              <Row  type="flex"  align="middle">
+                <Col span={12}>
+                  {getFieldDecorator('code', {
+                    rules: [{required: true, message: '请输入验证码'},{len: 4, message: '请输入合法验证码'}]})(
+                    <Input 
+                      prefix={<Icon type="code-sandbox" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                      placeholder="验证码"
+                    />
+                  )}
+                </Col>
+                <Col span={12}>
+                  <img className="code" onClick={this.getCaptureImg} src={this.state.captureImg} alt="验证码" />
+                </Col>
+              </Row>
             </Item>
             <Item>
               <Button type="primary" htmlType="submit" className="login-form-button">登录</Button>
