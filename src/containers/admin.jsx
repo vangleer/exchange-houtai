@@ -2,6 +2,7 @@ import React,{Component} from 'react'
 import {reqCheckLogin} from '../service/service'
 import { Layout, Button, Menu, Icon } from 'antd'
 import ROUTES from '../config/routes.js'
+import logo from '../static/imgs/logo.png'
 import '../css/admin.less'
 const { Header, Footer, Sider, Content } = Layout
 const { SubMenu,Item } = Menu
@@ -63,9 +64,13 @@ export default class Admin extends Component {
     return (
       <Layout className="admin">
         <Sider>
+          <div className="logo-box">
+            <img src={logo} alt="共享数据"/>
+            <h1>共享数据后台</h1>
+          </div>
           <Menu
-            defaultSelectedKeys={['1']}
-            defaultOpenKeys={['sub1']}
+            defaultSelectedKeys={['home']}
+            defaultOpenKeys={['']}
             mode="inline"
             theme="dark"
           >

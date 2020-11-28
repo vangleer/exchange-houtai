@@ -55,3 +55,21 @@
   border-left: 20px solid transparent;
   border-right: 20px solid transparent;
 }
+.logo-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  width: 100%;
+  background-color: rgba(75, 132, 125, 0.2);
+  cursor: pointer;
+}
+.logo-box img {
+  width: 50px;
+}
+.logo-box h1 {
+  font-size: 18px;
+  color: #fff;
+  margin-left: 8px;
+  margin-top: 6px;
+}
