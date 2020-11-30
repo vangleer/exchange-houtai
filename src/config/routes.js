@@ -57,8 +57,8 @@ export default [
         name: '货币日志'
       },
       {
-        path: '/banklist',
-        key: 'banklist',
+        path: '/bankList',
+        key: 'bankList',
         icon: 'money-collect',
         name: '银行列表'
       }
@@ -97,8 +97,8 @@ export default [
         name: '挂单列表'
       },
       {
-        path: '/conversionlist',
-        key: 'conversionlist',
+        path: '/conversionList',
+        key: 'conversionList',
         icon: 'safety-certificate',
         name: '订单列表'
       },
@@ -109,8 +109,8 @@ export default [
         name: '委托挂单列表'
       },
       {
-        path: '/delegatelist',
-        key: 'delegatelist',
+        path: '/delegateList',
+        key: 'delegateList',
         icon: 'safety-certificate',
         name: '委托订单列表'
       },
@@ -121,8 +121,8 @@ export default [
         name: '划转挂单列表'
       },
       {
-        path: '/exchangelist',
-        key: 'exchangelist',
+        path: '/exchangeList',
+        key: 'exchangeList',
         icon: 'safety-certificate',
         name: '划转订单列表'
       },
@@ -193,8 +193,8 @@ export default [
         name: '管理员日志'
       },
       {
-        path: '/AdministratorReplyStatistics',
-        key: 'AdministratorReplyStatistics',
+        path: '/administratorReplyStatistics',
+        key: 'administratorReplyStatistics',
         icon: 'code-sandbox',
         name: '管理员回复统计'
       },

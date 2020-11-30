@@ -30,10 +30,12 @@ export default class Admin extends Component {
       if(res.status === 1) this.setState({userInfo:res.data})
     }
   }
-  toggleCollapsed = () => {
-    this.setState({
-      collapsed: !this.state.collapsed
-    })
+  // logout 退出登录
+  logout = () => {
+    // 1.清除本地存储的token
+    localStorage.removeItem('token')
+    // 2.跳转的 login
+    this.props.history.replace('/login')
   }
   // 递归调用渲染导航函数
   randerRoutes = (item) => {
@@ -83,7 +85,7 @@ export default class Admin extends Component {
             <div className="header-box">
               <Button icon={isFullscreen?'fullscreen':'fullscreen-exit'} size="small" onClick={()=>this.setState({isFullscreen:!isFullscreen})}></Button>
               <span className="username">欢迎 {userInfo.user_name}</span>
-              <Button type="link">退出</Button>
+              <Button type="link" onClick={this.logout}>退出</Button>
             </div>
             <div className="header-bom">
               <div className="title"><span>会员管理</span><div className="shanjiao"></div></div>
