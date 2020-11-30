@@ -1,9 +1,46 @@
 import React,{Component} from 'react'
 import {reqCheckLogin} from '../service/service'
+import {Switch,Redirect,Route,NavLink} from 'react-router-dom'
 import { Layout, Button, Menu, Icon } from 'antd'
 import ROUTES from '../config/routes.js'
 import logo from '../static/imgs/logo.png'
 import '../css/admin.less'
+
+/** 导入路由组件 */
+// 首页
+import Home from './home.jsx'
+// 会员管理
+import MemberList from './member/memberList'
+import MemberBehavior from './member/memberBehavior'
+import MemberComplaint from './member/memberComplaint'
+// 财务管理
+import StatisticsSum from './fanacial/statisticsSum'
+import ReplacementLogList from './fanacial/replacementLogList'
+import CurrencyJournalList from './fanacial/currencyJournalList'
+import BankList from './fanacial/bankList'
+// 系统管理 
+import SystemConfig from './system/systemConfig'
+import CustomerServiceCenter from './system/customerServiceCenter'
+// 交易管理
+import Matching from './transaction_management/matching'
+import ConversionList from './transaction_management/conversionList'
+import Delegate from './transaction_management/delegate'
+import DelegateList from './transaction_management/delegateList'
+import ExchangeOrderList from './transaction_management/exchangeOrderList'
+import ExchangeList from './transaction_management/exchangeList'
+import ServiceProviderlist from './transaction_management/serviceProviderlist'
+import Give from './transaction_management/give'
+// 广告管理
+import Swiper from './advertising_management/swiper'
+// 内容管理
+import ArticleClassification from './content_management/articleClassification'
+import News from './content_management/news'
+// 管理
+import Administrator from './management/administrator'
+import AdministratorLog from './management/administratorLog'
+import AdministratorReplyStatistics from './management/administratorReplyStatistics'
+import Nav from './management/nav'
+
 const { Header, Footer, Sider, Content } = Layout
 const { SubMenu,Item } = Menu
 export default class Admin extends Component {
@@ -12,10 +49,36 @@ export default class Admin extends Component {
     userInfo:{},
     isFullscreen:true,
     collapsed: false,
+    currentKey:'home'
   }
   componentDidMount() {
     // 检查是否登录
     this.checkLogin()
+    console.log(this.getParentKey())
+  }
+  // 获取当前路由下的 key
+  getCurrentKey = () => this.props.location.pathname.split('/').reverse()[0]
+  // 获取当前路由下的 key 的父标签的key
+  getParentKey = () => {
+    // 1.获取当前路由的key
+    const currentKey = this.props.location.pathname.split('/').reverse()[0]
+    // 2.循环遍历 ROUTES
+    for(let i = 0; i < ROUTES.length;i++) {
+      // 2.1 得到每一项
+      let item = ROUTES[i]
+      // 2.2声明一个变量
+      let result = false
+      // 2.3如果item有children并且children1的length大于0的话,去查找当前item是否有当前路由key
+      if(item.children && item.children.length > 0) {
+        result = item.children.some(item2 => item2.key === currentKey)
+      } 
+      // 如果找到了，直接返回父元素的key
+      if(result) {
+        return item.key
+      }
+    }
+    // 没找到返回空字符串
+    return '' 
   }
   // 检查是否登录方法
   checkLogin = async () => {
@@ -54,10 +117,12 @@ export default class Admin extends Component {
       )
      } else {
        return (
-         <Item key={item.key}>
-           <Icon type={item.icon} />
-           <span>{item.name}</span>
-         </Item>
+        <Item key={item.key}>
+          <NavLink to={'/admin' + item.path}>
+            <Icon type={item.icon} />
+            <span>{item.name}</span>
+          </NavLink> 
+        </Item>
        )
      }
   }
@@ -71,8 +136,8 @@ export default class Admin extends Component {
             <h1>共享数据后台</h1>
           </div>
           <Menu
-            defaultSelectedKeys={['home']}
-            defaultOpenKeys={['']}
+            defaultSelectedKeys={[this.getCurrentKey()]}
+            defaultOpenKeys={[this.getParentKey()]}
             mode="inline"
             theme="dark"
           >
@@ -93,8 +158,40 @@ export default class Admin extends Component {
             </div>
           </Header>
           <Button className="fullscreen-btn" style={{display:isFullscreen?'none':'block'}} icon={isFullscreen?'fullscreen':'fullscreen-exit'} size="small" onClick={()=>this.setState({isFullscreen:!isFullscreen})}></Button>
-          <Content>Content</Content>
-          <Footer>Footer</Footer>
+          <Content className="content">
+            {/* 配置路由 */}
+            <Switch>
+              <Route path="/admin/home" component={Home}/>
+              <Route path="/admin/memberList" component={MemberList}/>
+              <Route path="/admin/memberBehavior" component={MemberBehavior}/>
+              <Route path="/admin/memberComplaint" component={MemberComplaint}/>
+              <Route path="/admin/statisticsSum" component={StatisticsSum}/>
+              <Route path="/admin/replacementLogList" component={ReplacementLogList}/>
+              <Route path="/admin/currencyJournalList" component={CurrencyJournalList}/>
+              <Route path="/admin/bankList" component={BankList}/>
+              <Route path="/admin/systemConfig" component={SystemConfig}/>
+              <Route path="/admin/customerServiceCenter" component={CustomerServiceCenter}/>
+              <Route path="/admin/matching" component={Matching}/>
+              <Route path="/admin/conversionList" component={ConversionList}/>
+              <Route path="/admin/delegate" component={Delegate}/>
+              <Route path="/admin/delegateList" component={DelegateList}/>
+              <Route path="/admin/exchangeOrderList" component={ExchangeOrderList}/>
+              <Route path="/admin/exchangeList" component={ExchangeList}/>
+              <Route path="/admin/serviceProviderlist" component={ServiceProviderlist}/>
+              <Route path="/admin/give" component={Give}/>
+              <Route path="/admin/swiper" component={Swiper}/>
+              <Route path="/admin/articleClassification" component={ArticleClassification}/>
+              <Route path="/admin/news" component={News}/>
+              <Route path="/admin/administrator" component={Administrator}/>
+              <Route path="/admin/administratorLog" component={AdministratorLog}/>
+              <Route path="/admin/administratorReplyStatistics" component={AdministratorReplyStatistics}/>
+              <Route path="/admin/nav" component={Nav}/>
+              <Redirect to="/admin/home"/>  
+            </Switch> 
+          </Content>
+          <Footer className="footer">
+            <span>在谷歌浏览器使用本系统，可以得到极致的用户体验</span>
+          </Footer>
         </Layout>
       </Layout>
     )
