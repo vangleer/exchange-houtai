@@ -8,7 +8,7 @@ function App() {
       <Switch>
         <Route path="/admin" component={Admin}/>
         <Route path="/login" component={Login}/>
-        <Redirect to="/admin"/>  
+        <Redirect to="/admin/home"/>  
       </Switch>
     </div>
   )

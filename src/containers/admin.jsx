@@ -49,15 +49,17 @@ export default class Admin extends Component {
     userInfo:{},
     isFullscreen:true,
     collapsed: false,
-    currentKey:'home'
+    currentTitle:''
   }
   componentDidMount() {
     // 检查是否登录
     this.checkLogin()
-    console.log(this.getParentKey())
   }
   // 获取当前路由下的 key
-  getCurrentKey = () => this.props.location.pathname.split('/').reverse()[0]
+  getCurrentKey = () => {
+    let key = this.props.location.pathname.split('/').reverse()[0]
+    return key === 'admin' ? 'home' : key
+  }
   // 获取当前路由下的 key 的父标签的key
   getParentKey = () => {
     // 1.获取当前路由的key
@@ -68,17 +70,28 @@ export default class Admin extends Component {
       let item = ROUTES[i]
       // 2.2声明一个变量
       let result = false
+      let name = ''
       // 2.3如果item有children并且children1的length大于0的话,去查找当前item是否有当前路由key
       if(item.children && item.children.length > 0) {
-        result = item.children.some(item2 => item2.key === currentKey)
-      } 
-      // 如果找到了，直接返回父元素的key
-      if(result) {
-        return item.key
+        result = item.children.some(item2 => {
+          if(item2.key === currentKey) {
+            name = item2.name
+            return true
+          } else {
+            return false
+          }
+        })
+        // 如果找到了，直接返回父元素的key和name
+        if(result) {
+          return {key:item.key,name:name}
+        }
+      } else {
+        if(item.key === currentKey) {
+          return {key:item.key,name:item.name}
+        }
       }
     }
-    // 没找到返回空字符串
-    return '' 
+    return {key:'home',name:'首页'}
   }
   // 检查是否登录方法
   checkLogin = async () => {
@@ -104,16 +117,16 @@ export default class Admin extends Component {
   randerRoutes = (item) => {
     if (item.children && item.children.length > 0) {
       return (
-       <SubMenu
+        <SubMenu
            key={item.key}
            title={
            <span>
              <Icon type={item.icon} />
              <span>{item.name}</span>
            </span>}
-         >
+        >
            {item.children.map((item2)=>this.randerRoutes(item2))}
-       </SubMenu>
+        </SubMenu>
       )
      } else {
        return (
@@ -128,6 +141,7 @@ export default class Admin extends Component {
   }
   render() {
     const {isFullscreen,userInfo} = this.state
+    const parent = this.getParentKey()
     return (
       <Layout className="admin">
         <Sider>
@@ -137,12 +151,11 @@ export default class Admin extends Component {
           </div>
           <Menu
             defaultSelectedKeys={[this.getCurrentKey()]}
-            defaultOpenKeys={[this.getParentKey()]}
+            defaultOpenKeys={[parent.key]}
             mode="inline"
             theme="dark"
           >
             {ROUTES.map(item=>this.randerRoutes(item))}
-           
           </Menu>
         </Sider>
         <Layout>
@@ -153,7 +166,7 @@ export default class Admin extends Component {
               <Button type="link" onClick={this.logout}>退出</Button>
             </div>
             <div className="header-bom">
-              <div className="title"><span>会员管理</span><div className="shanjiao"></div></div>
+              <div className="title"><span>{parent.name}</span><div className="shanjiao"></div></div>
               <div className="time">2020-11-17 03:20:34</div>
             </div>
           </Header>

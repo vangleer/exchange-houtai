@@ -12,7 +12,7 @@ class Login extends Component {
   }
   componentDidMount() {
     if(localStorage.getItem('token')) {
-      this.props.history.replace('/admin')
+      this.props.history.replace('/admin/home')
     }
   }
   // 验证密码的函数
