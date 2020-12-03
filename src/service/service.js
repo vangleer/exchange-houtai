@@ -33,3 +33,12 @@ export const reqMemeberList = ({
     sort_by,
   })
 }
+// 是否冻结
+export const reqUserProhibition = ({userId,isLock,reason}) => axios.post("/Admin/User/userProhibition", {userId,isLock,reason})
+export const	reqChangeServiceProvider = ({userId,isp,money}) => {
+  return axios.post("/Admin/User/changeServiceProvider", {
+    userId,
+    isp,
+    money
+  })
+}

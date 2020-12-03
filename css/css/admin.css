@@ -5,6 +5,9 @@
 .admin .ant-menu-dark .ant-menu-inline.ant-menu-sub {
   background-color: rgba(0, 0, 0, 0);
 }
+.admin .ant-layout-content {
+  min-height: auto;
+}
 .header {
   background-color: #fff;
   height: 100px;
@@ -92,7 +95,6 @@
   border-bottom: 1px solid #eee;
 }
 .card .card-body {
-  height: 60vh;
   background-color: #fff;
 }
 .card .card-body button {
