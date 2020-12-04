@@ -1,6 +1,16 @@
 import React,{Component} from 'react'
 import { Form, Input, Button, Table, Switch,message,Modal,Radio  } from 'antd'
-import {reqMemeberList,reqUserProhibition,reqChangeServiceProvider,reqUserAdd,reqUserListOfGoldCoins,reqUserTopUp,reqTransferCurrency,reqAuthUser,reqCancelAccount} from '../../service/service'
+import {
+  reqMemeberList,
+  reqUserProhibition,
+  reqChangeServiceProvider,
+  reqUserAdd,
+  reqUserListOfGoldCoins,
+  reqUserTopUp,
+  reqTransferCurrency,
+  reqAuthUser,
+  reqCancelAccount} 
+from '../../service/service'
 import dayjs from 'dayjs'
 const {Item} = Form
 class MemberList extends Component {
@@ -230,7 +240,20 @@ class MemberList extends Component {
     } else message.error(res.msg)
   }
   render() {
-    const {searchForm,reason,money,visibleReason,visibleMoney,currentUser,goldCoinList,goldMoney,goldId,editType,editReason,isServiceProvider} = this.state
+    const {
+      searchForm,
+      reason,
+      money,
+      visibleReason,
+      visibleMoney,
+      currentUser,
+      goldCoinList,
+      goldMoney,
+      goldId,
+      editType,
+      editReason,
+      isServiceProvider
+    } = this.state
     const {getFieldDecorator} = this.props.form
     const {total_count} = this.state.pageInfo
     const formItemLayout = {labelCol: { span: 4 },wrapperCol: { span: 16 }}
@@ -343,8 +366,6 @@ class MemberList extends Component {
           onCancel={()=>this.setState({authVisible:false})}
         >
           <Item {...formItemLayout} label="真实姓名">
-            {/* value={this.state.authName} onChange={(e)=>this.setState({authName:e.target.value})} */}
-            {/* value={this.state.authIdCard} onChange={(e)=>this.setState({authIdCard:e.target.value})} */}
             {getFieldDecorator('authName', {
               rules: [{ required: true, message: '请输入真实姓名' }],
               })(<Input  placeholder="请输入真实姓名" />)

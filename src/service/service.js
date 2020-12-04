@@ -62,3 +62,6 @@ export const reqTransferCurrency = ({user_id,currency_id,money,note}) => axios.p
 export const reqAuthUser = ({user_id,id_card,real_name}) => axios.post("/Admin/User/authUser", {user_id,id_card,real_name})
 // 是否冻结
 export const reqCancelAccount = ({user_id,reason}) => axios.post("/Admin/User/cancelAccount", {user_id,reason})
+
+// 会员行为信息
+export const reqMemberBehaviorList = ({mobile,content,page}) => axios.post("/Admin/UserBehavior/userBehaviorList", {mobile,content,page})
