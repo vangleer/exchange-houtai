@@ -1,6 +1,6 @@
 import React,{Component} from 'react'
 import { Form, Input, Button, Table, Switch,message,Modal,Radio  } from 'antd'
-import {reqMemeberList,reqUserProhibition,reqChangeServiceProvider} from '../../service/service'
+import {reqMemeberList,reqUserProhibition,reqChangeServiceProvider,reqUserAdd,reqUserListOfGoldCoins,reqUserTopUp,reqTransferCurrency,reqAuthUser,reqCancelAccount} from '../../service/service'
 import dayjs from 'dayjs'
 const {Item} = Form
 class MemberList extends Component {
@@ -10,9 +10,21 @@ class MemberList extends Component {
     pageInfo:{page: 1,total_count: 0,total_page: 0},
     searchForm:{},
     visibleReason:false,
+    addVisible:false,
+    editVisible:false,
+    editType:1, // 1修改，2划转
+    editReason:'',
+    goldCoinList:[],
+    goldMoney:'',
     reason:'',
+    isServiceProvider:false,
+    goldId:0,
     money:0,
+    authVisible:false,
+    destroyVisible:false,
+    destroyReason:'',
     switchData:{},
+    currentUser:{id:0,mobile:''},
     sortName:'',
     sortBy:'',
     columns: [
@@ -37,15 +49,12 @@ class MemberList extends Component {
         )
       },
       {title: '操作',width: 450,
-        render:row=>(
+        render:(text,record)=>(
           <div>
-            <Button type="primary">修改</Button>
-            <Button type="primary">划转</Button>
-            <Button type="primary">查看财务日志</Button>
-            <Button type="primary">实名认证</Button>
-            <Button type="primary">修改收款信息</Button>
-            <Button type="primary">注销账号</Button>
-            <Button type="primary">解绑兼职/优贝账户</Button>
+            <Button type="primary" onClick={()=>this.handleEditClick(record,1)}>修改</Button>
+            <Button type="primary" onClick={()=>this.handleEditClick(record,2)}>划转</Button>
+            <Button type="primary" onClick={()=>this.handleAuthClick(record)}>实名认证</Button>
+            <Button type="danger" onClick={()=>this.setState({currentUser:record,destroyVisible:true})}>注销账号</Button>
           </div>
         )
       },
@@ -61,11 +70,11 @@ class MemberList extends Component {
     if(switchData.type === 'is_lock') {
       if(reason.length > 0) { // is_lock 
         res = await reqUserProhibition({userId:switchData.id,isLock:switchData.value ? 1 : 0,reason})
-        this.setState({visibleReason:false})
+        this.setState({visibleReason:false,reason:''})
       } else return message.warning('请输入理由')
     } else { // is_service_provider
       res = await reqChangeServiceProvider({userId:switchData.id,isp:switchData.value? 1 : 0,money:money})
-      this.setState({visibleMoney:false})
+      this.setState({visibleMoney:false,money:0})
     }
     if(res.status === 1) {
       message.success(res.msg)
@@ -76,8 +85,9 @@ class MemberList extends Component {
     else message.error(res.msg)
   }
   handleSwitchChange = (row,type,value) => {
+    console.log(row,type,value)
     if(type === 'is_lock') this.setState({visibleReason:true,switchData:{id:row.id,type,value}})
-    else this.setState({visibleMoney:true,switchData:{id:row.id,type,value}})
+    else this.setState({visibleMoney:true,switchData:{id:row.id,type,value},isServiceProvider:value,currentUser:row})
   }
   // 会员信息列表
   getMemeberList  = async () => {
@@ -102,6 +112,15 @@ class MemberList extends Component {
       message.error(res.msg)
     }
   }
+  // 获取金币列表
+  getUserListOfGoldCoins = async (id) => {
+    const res = await reqUserListOfGoldCoins({userId:id})
+    if(res.status === 1) {
+      // 保存 goldCoinList
+      this.setState({goldCoinList:res.data})
+    }
+    console.log(res)
+  }
   // 修改分页
   changePage = (page) => {
     console.log(page)
@@ -116,21 +135,105 @@ class MemberList extends Component {
     searchForm[type] = e.target.value
     this.setState({searchForm})
   }
-
+  // 搜索
   handleSearch = (e) => {
     this.getMemeberList()
     e.preventDefault()
   }
+  // 排序
   handleTableChange = (page,filter,sort) => {
     // 有排序
     if(Object.keys(sort).length > 0) {
-      this.setState({sortName:sort.field,sortBy:sort.order === 'descend' ? 'desc':'asc'})
-      this.getMemeberList()
+      console.log(sort)
+      let order = sort.order === 'descend' ? 'desc':'asc'
+      this.setState({sortName:sort.field,sortBy:order})
+      setTimeout(()=>this.getMemeberList(),100)
     }
-  } 
+  }
+  // 添加会员
+  handleAddOk = () => {
+    this.props.form.validateFields(async (err, values)=>{
+      if(!err) {
+        const res = await reqUserAdd({type:1,account:values.mobile,password:values.password})
+        if(res.status === 1) {
+          // 提示
+          message.success(res.msg)
+          // 关闭弹窗
+          this.setState({addVisible:false})
+          // 重置表单
+          this.props.form.resetFields()
+        } else {
+          message.error(res.msg)
+        }
+      }
+    })
+  }
+  handleEditClick = (record,editType) => {
+    console.log(record.id)
+    this.setState({currentUser:record,editVisible:true,editType})
+    this.getUserListOfGoldCoins(record.id)
+  }
+  handleEditOk = async () => {
+    const {currentUser,goldMoney,goldId,editType,editReason} = this.state
+    if(goldId === 0) return message.error('请选择货币')
+    if(goldMoney.length < 1) return message.error('请输入金额')
+    let res
+    if(editType === 1) { // 修改
+        res = await reqUserTopUp({user_currency_id:goldId,money:goldMoney})
+    } else { // 划转
+      if(editReason.length < 1) return message.error('请输入原因')
+      res = await reqTransferCurrency({user_id: currentUser.id,currency_id: goldId,money: goldMoney,note:editReason})
+    }
+    if(res.status === 1) {
+      this.setState({editVisible:false,goldMoney:'',goldId:0,editReason:''})
+      this.getMemeberList()
+      message.success(res.msg)
+    } else {
+      message.error(res.msg)
+    }
+  }
+  // 点击实名认证
+  handleAuthClick = (record) => {
+    console.log(record)
+    this.setState({authVisible:true,userId:record.id})
+  }
+  // 实名认证 
+  handleAuthOk = async () => {
+    const {userId} = this.state
+    const authName = this.props.form.getFieldValue('authName')
+    const authIdCard = this.props.form.getFieldValue('authIdCard')
+    console.log(this.props.form)
+    if(!authName) return
+    if(!authIdCard) return
+    const res = await reqAuthUser({user_id:userId,id_card:authIdCard,real_name:authName})
+    if(res.status === 1) {
+      // 提示
+      message.success(res.msg)
+      // 关闭弹窗
+      this.setState({authVisible:false})
+      // 重置表单
+      this.props.form.resetFields()
+       
+    } else {
+      message.error(res.msg)
+    }
+  }
+  // 提交注销用户
+  handleDestroyOk = async () => {
+    const {destroyReason,currentUser} = this.state
+    if(!destroyReason) return message.error('请输入理由')
+    const res = await reqCancelAccount({user_id:currentUser.id,reason:destroyReason})
+    if(res.status === 1) {
+      message.success(res.msg)
+      this.setState({destroyReason:'',destroyVisible:false})
+      this.getMemeberList()
+    } else message.error(res.msg)
+  }
   render() {
-    const {searchForm,reason,money,visibleReason,visibleMoney} = this.state
+    const {searchForm,reason,money,visibleReason,visibleMoney,currentUser,goldCoinList,goldMoney,goldId,editType,editReason,isServiceProvider} = this.state
+    const {getFieldDecorator} = this.props.form
     const {total_count} = this.state.pageInfo
+    const formItemLayout = {labelCol: { span: 4 },wrapperCol: { span: 16 }}
     return (
       <div className="card">
         <div className="card-head">
@@ -142,7 +245,7 @@ class MemberList extends Component {
           <Item label="用户昵称"><Input placeholder="用户昵称" value={searchForm.nickName} onChange={(e)=>this.handleChange('nickName',e)}/></Item>
           <Item label="身份证"><Input placeholder="请输入身份证" value={searchForm.idCard} onChange={(e)=>this.handleChange('idCard',e)} /></Item>
           <Item><Button type="primary" htmlType="submit">搜索</Button></Item>
-          <Item><Button type="primary">添加会员</Button></Item>
+          <Item><Button type="primary" onClick={()=>this.setState({addVisible:true})}>添加会员</Button></Item>
         </Form>
         </div>
         <div className="card-body">
@@ -159,25 +262,109 @@ class MemberList extends Component {
         {/* 是否冻结弹框 */}
         <Modal
           title="提示"
-          content="请输入冻结的理由!"
           visible={visibleReason}
           onOk={this.handleReasonOk}
           onCancel={()=>this.setState({visibleReason:false})}
         >
-          <Input value={reason} onChange={(e)=>this.setState({reason:e.target.value})}/>
+          <Input placeholder="请输入冻结的理由!" value={reason} onChange={(e)=>this.setState({reason:e.target.value})}/>
         </Modal>
         {/* 是否开起服务商弹窗 */}
         <Modal
-          title="Basic Modal"
+          title="提示"
           visible={visibleMoney}
           onOk={this.handleReasonOk}
           onCancel={()=>this.setState({visibleMoney:false})}
         >
-          <Radio.Group onChange={(e)=>this.setState({money:e.target.value})} value={money}>
+          {isServiceProvider ? (<Radio.Group onChange={(e)=>this.setState({money:e.target.value})} value={money}>
             <Radio value={0}>0</Radio>
             <Radio value={3000}>3000</Radio>
             <Radio value={10000}>10000</Radio>
-          </Radio.Group>
+          </Radio.Group>) : '确认关闭服务商（'+currentUser.mobile+')！'}
+          
+        </Modal>
+        {/* 添加会员 */}
+        <Modal
+          title="添加会员"
+          okText="添加会员"
+          visible={this.state.addVisible}
+          onOk={this.handleAddOk}
+          onCancel={()=>this.setState({addVisible:false})}
+        >
+          <Form onSubmit={this.handleSubmit} className="login-form">
+            <Item {...formItemLayout} label="会员账号">
+              {getFieldDecorator('mobile', {
+                rules: [{ required: true, message: '请填写手机号或者邮箱' }],
+                })(<Input  placeholder="请填写手机号或者邮箱"/>)
+              }
+            </Item>
+            <Item {...formItemLayout} label="登录密码">
+              {getFieldDecorator('password', {
+                rules: [{ required: true, message: '登录密码不能为空' }],
+                })(<Input placeholder="请设置登录密码"/>)
+              }
+            </Item>
+          </Form>
+        </Modal>
+        {/* 修改会员 */}
+        <Modal
+          title={editType === 1 ? '修改' : '划转'}
+          okText={editType === 1 ? '修改' : '划转'}
+          visible={this.state.editVisible}
+          onOk={this.handleEditOk}
+          onCancel={()=>this.setState({editVisible:false})}
+        >
+          <Form onSubmit={this.handleSubmit} className="login-form">
+            <Item {...formItemLayout} label="会员账号">
+              <Input disabled value={currentUser.mobile}/>
+            </Item>
+            <Item {...formItemLayout} label="账户">
+              <Radio.Group onChange={(e)=>this.setState({goldId:e.target.value})} value={goldId}>
+                {goldCoinList.map(item=><Radio value={item.id} key={item.id}>{item.currency_name}</Radio>)}
+              </Radio.Group>
+            </Item>
+            <Item {...formItemLayout} label="金额">
+              <Input placeholder="请输入金额" value={goldMoney} onChange={(e)=>this.setState({goldMoney:e.target.value})}/>
+            </Item>
+            {
+              editType === 2 ?  
+              (<Item {...formItemLayout} label="原因">
+                <Input placeholder="请输入原因" value={editReason} onChange={(e)=>this.setState({editReason:e.target.value})}/>
+              </Item>) : ''
+            }
+           
+          </Form>
+        </Modal>
+        {/* 实名认证 */}
+        <Modal
+          title="实名认证"
+          okText="提交"
+          visible={this.state.authVisible}
+          onOk={this.handleAuthOk}
+          onCancel={()=>this.setState({authVisible:false})}
+        >
+          <Item {...formItemLayout} label="真实姓名">
+            {/* value={this.state.authName} onChange={(e)=>this.setState({authName:e.target.value})} */}
+            {/* value={this.state.authIdCard} onChange={(e)=>this.setState({authIdCard:e.target.value})} */}
+            {getFieldDecorator('authName', {
+              rules: [{ required: true, message: '请输入真实姓名' }],
+              })(<Input  placeholder="请输入真实姓名" />)
+            }
+          </Item>
+          <Item {...formItemLayout} label="身份证号">
+            {getFieldDecorator('authIdCard', {
+              rules: [{ required: true, message: '请输入身份证号' }],
+              })(<Input placeholder="请输入身份证号" />)
+            }
+          </Item>
+        </Modal>
+         {/* 注销用户弹窗*/}
+         <Modal
+          title="注销账号"
+          visible={this.state.destroyVisible}
+          onOk={this.handleDestroyOk}
+          onCancel={()=>this.setState({destroyVisible:false})}
+        >
+          <Input placeholder="请输入注销的理由!" value={this.state.destroyReason} onChange={(e)=>this.setState({destroyReason:e.target.value})}/>
         </Modal>
       </div>
     )

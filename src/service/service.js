@@ -42,3 +42,23 @@ export const	reqChangeServiceProvider = ({userId,isp,money}) => {
     money
   })
 }
+// 添加会员
+export const reqUserAdd = ({type,account,password}) => {
+  return axios.post("/Admin/User/userAdd", {
+    type,
+    account,
+    password
+  })
+}
+// 获取goldList
+export const reqUserListOfGoldCoins = ({userId}) => axios.post("/Admin/User/userListOfGoldCoins", {userId})
+
+//用户充值
+export const reqUserTopUp = ({user_currency_id,money}) => axios.post("/Admin/User/userTopUp", {user_currency_id,money})
+//用户划转
+export const reqTransferCurrency = ({user_id,currency_id,money,note}) => axios.post("/Admin/User/transferCurrency", {user_id,currency_id,money,note})
+
+//实名认证
+export const reqAuthUser = ({user_id,id_card,real_name}) => axios.post("/Admin/User/authUser", {user_id,id_card,real_name})
+// 是否冻结
+export const reqCancelAccount = ({user_id,reason}) => axios.post("/Admin/User/cancelAccount", {user_id,reason})

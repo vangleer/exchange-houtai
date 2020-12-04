@@ -54,6 +54,9 @@ export default class Admin extends Component {
   componentDidMount() {
     // 检查是否登录
     this.checkLogin()
+    this.props.history.listen((e) => {
+      console.log('123456',e)
+    })
   }
   // 获取当前路由下的 key
   getCurrentKey = () => {
