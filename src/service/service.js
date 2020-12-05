@@ -65,3 +65,15 @@ export const reqCancelAccount = ({user_id,reason}) => axios.post("/Admin/User/ca
 
 // 会员行为信息
 export const reqMemberBehaviorList = ({mobile,content,page}) => axios.post("/Admin/UserBehavior/userBehaviorList", {mobile,content,page})
+//问题反馈列表
+export const reqFeedbackList = ({id,page,status,mobile,feedback_type_id,realName}) => {
+  return axios.post("/Admin/Feedback/feedbackList",{id,page,status,feedback_type_id,mobile,realName})
+} 
+// 会员行为信息
+export const reqFeedbackDicList = () => axios.post("/Admin/Feedback/feedbackDicList")
+//问题反馈聊天列表
+export const reqFeedbackDetails = ({feedbackId}) => axios.post("/Admin/Feedback/feedbackDetails", {feedbackId})
+//问题反馈聊天回复
+export const reqFeedbackReply = ({content,feedbackId}) => axios.post("/Admin/Feedback/feedbackReply", {content,feedbackId})
+// 删除问题反馈
+export const reqFeedbackReplyDel = ({feedbackId}) => axios.post("/Admin/Feedback/feedbackReplyDel", {feedbackId})

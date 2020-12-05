@@ -1,5 +1,5 @@
 import React,{Component} from 'react'
-import { Form, Input, Button, Table, Switch,message,Modal,Radio  } from 'antd'
+import { Form, Input, Button, Table, Switch,message,Modal } from 'antd'
 import {reqMemberBehaviorList,reqUserProhibition} from '../../service/service'
 const {Item} = Form
 export default class MemberBehavior extends Component {
