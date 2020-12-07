@@ -9,15 +9,16 @@ export default class ReplacementLogList extends Component {
     searchForm:{},
     page:1,
     pageInfo:{page: 1,total_count: 0,total_page: 0},
+    loading:false,
     typeList: [
       {value: '1', name: '转入', id: '1'},
-      {value: '2', name: '转出', id: '2'},
+      {value: '2', name: '转出', id: '2'}
     ],
     stateList: [
       {value: '1', name: '成功', id: '1'},
       {value: '2', name: '发起中', id: '2'},
       {value: '3', name: '失败', id: '2'},
-      {value: '4', name: '待审核', id: '2'},
+      {value: '4', name: '待审核', id: '2'}
     ],
     currencyList:[],
     replacementLogList:[],
@@ -65,6 +66,7 @@ export default class ReplacementLogList extends Component {
   }
   // 获取列表
   getReplacementLogList = async () => {
+    this.setState({loading:true})
     const {page,searchForm,userId} = this.state
     const res = await reqReplacementLogList({
       page: page,
@@ -80,7 +82,7 @@ export default class ReplacementLogList extends Component {
     console.log(res)
     if(res.status === 1) {
       let pageInfo = res.data.page_info ? res.data.page_info : {page: 1,total_count: 0,total_page: 0}
-      this.setState({replacementLogList:res.data.list,pageInfo: pageInfo})
+      this.setState({replacementLogList:res.data.list,pageInfo: pageInfo,loading:false})
     } else message.error(res.msg)
   }
   // 获取货币列表
@@ -123,7 +125,7 @@ export default class ReplacementLogList extends Component {
     })
   }
   render() {
-    const {searchForm,typeList,replacementLogList,stateList,currencyList} = this.state
+    const {searchForm,typeList,replacementLogList,stateList,currencyList,loading} = this.state
     const {total_count} = this.state.pageInfo
     return (
       <div className="member-behavior">
@@ -135,14 +137,14 @@ export default class ReplacementLogList extends Component {
               <Item label="订单号"><Input placeholder="订单号" value={searchForm.orderNum} onChange={(e)=>this.handleChange('orderNum',e)}/></Item>
               <Item label="置换账号"><Input placeholder="置换账号" value={searchForm.replacementAccount} onChange={(e)=>this.handleChange('replacementAccount',e)}/></Item>
               <Item label="类型">
-              <Select defaultValue="全部" style={{ width: 120 }} onChange={(value)=>this.handleChange('type',value)}>
-                {typeList.map(item=><Option key={item.id} value={item.id}>{item.name}</Option>)}
-              </Select>
+                <Select defaultValue="全部" style={{ width: 120 }} onChange={(value)=>this.handleChange('type',value)}>
+                  {typeList.map(item=><Option key={item.id} value={item.id}>{item.name}</Option>)}
+                </Select>
               </Item>
               <Item label="状态">
-              <Select defaultValue="全部" style={{ width: 120 }} onChange={(value)=>this.handleChange('state',value)}>
-                {stateList.map(item=><Option key={item.id} value={item.id}>{item.name}</Option>)}
-              </Select>
+                <Select defaultValue="全部" style={{ width: 120 }} onChange={(value)=>this.handleChange('state',value)}>
+                  {stateList.map(item=><Option key={item.id} value={item.id}>{item.name}</Option>)}
+                </Select>
               </Item>
               <Item label="币种">
                 <Select defaultValue="全部" style={{ width: 120 }} onChange={(value)=>this.handleChange('currencyId',value)}>
@@ -158,7 +160,7 @@ export default class ReplacementLogList extends Component {
               columns={this.state.columns}
               bordered
               rowKey="id"
-              loading={replacementLogList.length === 0}
+              loading={loading}
               pagination={{pageSize:10,total:total_count,onChange:this.changePage}}
             />
           </div>

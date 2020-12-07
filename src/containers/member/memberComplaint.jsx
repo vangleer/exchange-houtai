@@ -9,6 +9,7 @@ export default class MemberComplaint extends Component {
     searchForm:{},
     page:1,
     pageInfo:{page: 1,total_count: 0,total_page: 0},
+    loading:false,
     feedbackTypeList: [],
     visibleReply :false,
     reply:'',
@@ -57,12 +58,13 @@ export default class MemberComplaint extends Component {
   }
   // 获取列表
   geFeedbackList = async () => {
+    this.setState({loading:true})
     const {page} = this.state
     const res = await reqFeedbackList({page,...this.state.searchForm})
     console.log(res)
     if(res.status === 1) {
       let pageInfo = res.data.page_info ? res.data.page_info : {page: 1,total_count: 0,total_page: 0}
-      this.setState({feedbackTypeList:res.data.list,pageInfo: pageInfo})
+      this.setState({feedbackTypeList:res.data.list,pageInfo: pageInfo,loading:false})
     } else message.error(res.msg)
   }
   // 获取反馈列表
@@ -128,7 +130,7 @@ export default class MemberComplaint extends Component {
     })
   } 
   render() {
-    const {searchForm,visibleReply,currentFeedbackList,recoilState,feedbackTypeList,reply} = this.state
+    const {searchForm,visibleReply,currentFeedbackList,recoilState,feedbackTypeList,reply,loading} = this.state
     const {total_count} = this.state.pageInfo
     return (
       <div className="member-behavior">
@@ -157,6 +159,7 @@ export default class MemberComplaint extends Component {
             columns={this.state.columns}
             bordered
             rowKey="id"
+            loading={loading}
             pagination={{pageSize:10,total:total_count,onChange:this.changePage}}
           />
           </div>

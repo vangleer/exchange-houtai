@@ -37,6 +37,7 @@ class MemberList extends Component {
     currentUser:{id:0,mobile:''},
     sortName:'',
     sortBy:'',
+    loading:false,
     columns: [
       {title: '会员ID',dataIndex: 'id',key: 'id', width: 80},
       {title: '姓名',dataIndex: 'real_name',key: 'real_name', width: 100},
@@ -101,6 +102,7 @@ class MemberList extends Component {
   }
   // 会员信息列表
   getMemeberList  = async () => {
+    this.setState({loading:true})
     const {page,searchForm,sortBy,sortName} = this.state
     const res = await reqMemeberList({
       page: page,
@@ -117,7 +119,7 @@ class MemberList extends Component {
     if(res.status === 1) {
       // 保存数据
       console.log(res.data)
-      this.setState({memberList:res.data.list,pageInfo:res.data.page_info})
+      this.setState({memberList:res.data.list,pageInfo:res.data.page_info,loading:false})
     } else {
       message.error(res.msg)
     }
@@ -252,7 +254,8 @@ class MemberList extends Component {
       goldId,
       editType,
       editReason,
-      isServiceProvider
+      isServiceProvider,
+      loading
     } = this.state
     const {getFieldDecorator} = this.props.form
     const {total_count} = this.state.pageInfo
@@ -278,6 +281,7 @@ class MemberList extends Component {
             scroll={{ x: 1500}}
             bordered
             rowKey="id"
+            loading={loading}
             onChange={this.handleTableChange}
             pagination={{pageSize:10,total:total_count,onChange:this.changePage}}
           />

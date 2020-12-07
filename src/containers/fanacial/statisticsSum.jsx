@@ -5,6 +5,7 @@ const {Item} = Form
 export default class StatisticsSum extends Component {
   state = {
     financialStatisticsList:[],
+    loading:false,
     columns: [
       {title: '金币名称',dataIndex: 'name',key: 'name'},
       {title: '充币总数',dataIndex: 'total_charge',key: 'total_charge'},
@@ -23,16 +24,17 @@ export default class StatisticsSum extends Component {
     this.getStatisticsSumList()
   }
   getStatisticsSumList = async () => {
+    this.setState({loading:true})
     const res = await reqStatisticsSum()
     console.log(res)
     if(res.status === 1) {
       // 保存数据
-      this.setState({financialStatisticsList:res.data})
+      this.setState({financialStatisticsList:res.data,loading:false})
     } else message.error(res.msg)
   }
   
   render() {
-    const {financialStatisticsList,columns} = this.state
+    const {financialStatisticsList,columns,loading} = this.state
     return (
       <div className="member-behavior">
         <div className="card">
@@ -43,7 +45,7 @@ export default class StatisticsSum extends Component {
             columns={columns}
             bordered
             rowKey="id"
-            loading={financialStatisticsList.length === 0}
+            loading={loading}
           />
           </div>
         </div>

@@ -71,9 +71,9 @@ export const reqFeedbackList = ({id,page,status,mobile,feedback_type_id,realName
 } 
 // 会员行为信息
 export const reqFeedbackDicList = () => axios.post("/Admin/Feedback/feedbackDicList")
-//问题反馈聊天列表
+// 问题反馈聊天列表
 export const reqFeedbackDetails = ({feedbackId}) => axios.post("/Admin/Feedback/feedbackDetails", {feedbackId})
-//问题反馈聊天回复
+// 问题反馈聊天回复
 export const reqFeedbackReply = ({content,feedbackId}) => axios.post("/Admin/Feedback/feedbackReply", {content,feedbackId})
 // 删除问题反馈
 export const reqFeedbackReplyDel = ({feedbackId}) => axios.post("/Admin/Feedback/feedbackReplyDel", {feedbackId})
@@ -82,9 +82,8 @@ export const reqFeedbackReplyDel = ({feedbackId}) => axios.post("/Admin/Feedback
 export const reqStatisticsSum = () => axios.post("/Admin/Statistics/StatisticsSun")
 // 获取货币列表
 export const reqCurrencyList = () => axios.post("/Admin/UserFinance/currencyList")
-//货币日志列表
-export const reqReplacementLogList = ({page,user_id,replacementAccount,order_num,currency_id,status,type,mobile,realName
-}) => {
+// 置换日志列表
+export const reqReplacementLogList = ({page,user_id,replacementAccount,order_num,currency_id,status,type,mobile,realName}) => {
   return axios.post("/Admin/UserFinance/ReplacementLogList", {
     user_id,
     replacementAccount,
@@ -98,5 +97,17 @@ export const reqReplacementLogList = ({page,user_id,replacementAccount,order_num
   })
 }
 
-//置换日志变更状态
+// 置换日志变更状态
 export const reqReplacementLogUpdate = ({id,type}) => axios.post("/Admin/UserFinance/ReplacementLogUpdate", {id,type})
+
+// 货币日志列表
+export const reqCurrencyJournalList = ({page,content,currency_id,type,mobile,realName}) => {
+  return axios.post("/Admin/UserFinance/CurrencyJournalList", {
+    page,
+    currency_id,
+    content,
+    type,
+    mobile,
+    realName
+  })
+}
