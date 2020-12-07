@@ -77,3 +77,6 @@ export const reqFeedbackDetails = ({feedbackId}) => axios.post("/Admin/Feedback/
 export const reqFeedbackReply = ({content,feedbackId}) => axios.post("/Admin/Feedback/feedbackReply", {content,feedbackId})
 // 删除问题反馈
 export const reqFeedbackReplyDel = ({feedbackId}) => axios.post("/Admin/Feedback/feedbackReplyDel", {feedbackId})
+
+// 财务系统, 获取财务统计数据
+export const reqStatisticsSum = () => axios.post("/Admin/Statistics/StatisticsSun")
