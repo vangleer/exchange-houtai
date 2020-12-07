@@ -80,3 +80,23 @@ export const reqFeedbackReplyDel = ({feedbackId}) => axios.post("/Admin/Feedback
 
 // 财务系统, 获取财务统计数据
 export const reqStatisticsSum = () => axios.post("/Admin/Statistics/StatisticsSun")
+// 获取货币列表
+export const reqCurrencyList = () => axios.post("/Admin/UserFinance/currencyList")
+//货币日志列表
+export const reqReplacementLogList = ({page,user_id,replacementAccount,order_num,currency_id,status,type,mobile,realName
+}) => {
+  return axios.post("/Admin/UserFinance/ReplacementLogList", {
+    user_id,
+    replacementAccount,
+    order_num,
+    currency_id,
+    page,
+    status,
+    type,
+    mobile,
+    realName
+  })
+}
+
+//置换日志变更状态
+export const reqReplacementLogUpdate = ({id,type}) => axios.post("/Admin/UserFinance/ReplacementLogUpdate", {id,type})
