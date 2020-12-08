@@ -37,7 +37,6 @@ export default class SystemConfig extends Component {
           </div>
         )
       },
-     
     ]
   }
   componentDidMount() {
@@ -56,24 +55,12 @@ export default class SystemConfig extends Component {
       this.setState({loading:false})
     }
   }
-  // 搜索
-  handleSearch = (e) => {
-    console.log(this.state.searchForm)
-    this.getConfigList()
-    e.preventDefault()
-  }
   // 分页改变
   changePage = (page) => {
     this.setState({page})
     setTimeout(()=>{
       this.getConfigList()
     },100)
-  }
-  // 上传文件状态改变
-  handleUploadChange = (info) => {
-    if (info.file.status === 'done') {
-      this.setState({imageUrl:info.file.response.data.url})
-    }
   }
   // 点击添加
   handleAddOk = async () => {
@@ -93,6 +80,7 @@ export default class SystemConfig extends Component {
       this.getConfigList()
     } else message.error(res.msg)
   }
+  // 点击删除
   handleDelete = (record) => {
     Modal.confirm({
       title: '提示',

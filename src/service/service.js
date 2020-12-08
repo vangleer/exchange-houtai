@@ -137,3 +137,13 @@ export const reqEditConfig = ({
 }) => axios.post("/Admin/SystemConfig/configEdit", {name,value,desc})
 
 export const reqDeleleConfig = ({name}) => axios.post("/Admin/SystemConfig/delConfig", {name})
+
+//热更新
+export const reqHotUpdateList = () => axios.post("/Admin/HotUpdate/HotUpdateList", {})
+// 修改热更新
+export const  reqHotUpdateEdit = ({
+  hot_update_id,
+  version,
+  download_url,
+  content
+}) => axios.post("/Admin/HotUpdate/HotUpdateEdit", {hot_update_id,version,download_url,content})
