@@ -1,6 +1,6 @@
 import React,{Component} from 'react'
-import { Form, Input, Button, Table,message,Select,Modal} from 'antd'
-import {reqCurrencyList,reqReplacementLogUpdate,reqCurrencyJournalList} from '../../service/service'
+import { Form, Input, Button, Table,message,Select} from 'antd'
+import {reqCurrencyList,reqCurrencyJournalList} from '../../service/service'
 import dayjs from 'dayjs'
 const {Item} = Form
 const {Option} = Select

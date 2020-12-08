@@ -111,3 +111,10 @@ export const reqCurrencyJournalList = ({page,content,currency_id,type,mobile,rea
     realName
   })
 }
+// 获取银行列表
+export const reqBankList = ({name,page}) => axios.post("/Admin/UserFinance/getBankList", {name,page})
+// 添加修改银行
+export const reqUpdateBank = ({name,logo,id}) => axios.post("/Admin/UserFinance/updateBank", {name,logo,id})
+
+//删除银行
+export const reqDeleteBank = ({id}) => axios.post("/Admin/UserFinance/deleteNBank", {id})
