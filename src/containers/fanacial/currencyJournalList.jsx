@@ -56,7 +56,10 @@ export default class CurrencyJournalList extends Component {
     if(res.status === 1) {
       let pageInfo = res.data.page_info ? res.data.page_info : {page: 1,total_count: 0,total_page: 0}
       this.setState({currencyJournalList:res.data.list,pageInfo: pageInfo,loading:false})
-    } else message.error(res.msg)
+    }else {
+      message.error(res.msg)
+      this.setState({loading:false})
+    } 
   }
   // 获取货币列表
   getCurrencyList = async () => {
@@ -83,7 +86,7 @@ export default class CurrencyJournalList extends Component {
     const {searchForm,typeList,currencyJournalList,currencyList,loading} = this.state
     const {total_count} = this.state.pageInfo
     return (
-      <div className="member-behavior">
+      <div className="doc">
         <div className="card">
           <div className="card-head">
             <Form layout="inline" onSubmit={this.handleSearch}>

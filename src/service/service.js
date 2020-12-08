@@ -118,3 +118,22 @@ export const reqUpdateBank = ({name,logo,id}) => axios.post("/Admin/UserFinance/
 
 //删除银行
 export const reqDeleteBank = ({id}) => axios.post("/Admin/UserFinance/deleteNBank", {id})
+
+// 获取系统配置列表
+export const reqConfigList = ({page}) => axios.post("/Admin/SystemConfig/ConfigList", {page})
+
+// 添加系统配置
+export const reqAddConfig = ({
+  name,
+  value,
+  desc
+}) => axios.post("/Admin/SystemConfig/addConfig", {name,value,desc})
+
+// 修改系统配置
+export const reqEditConfig = ({
+  name,
+  value,
+  desc
+}) => axios.post("/Admin/SystemConfig/configEdit", {name,value,desc})
+
+export const reqDeleleConfig = ({name}) => axios.post("/Admin/SystemConfig/delConfig", {name})

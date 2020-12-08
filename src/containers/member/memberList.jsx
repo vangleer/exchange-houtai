@@ -122,6 +122,7 @@ class MemberList extends Component {
       this.setState({memberList:res.data.list,pageInfo:res.data.page_info,loading:false})
     } else {
       message.error(res.msg)
+      this.setState({loading:false})
     }
   }
   // 获取金币列表

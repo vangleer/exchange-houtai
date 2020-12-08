@@ -23,7 +23,7 @@ export default class BankList extends Component {
         render:(text,record)=>(
           <div>
             <Button type="primary" onClick={()=>this.setState({currentBank:record,addBankName:record.name,imageUrl:record.logo,addVisible:true,operType:'edit'})}>修改</Button>
-            <Button type="danger" onClick={()=>this.handleDelete(record,2)}>删除</Button>
+            <Button type="danger" onClick={()=>this.handleDelete(record)}>删除</Button>
           </div>
         )
       },
@@ -50,7 +50,10 @@ export default class BankList extends Component {
     if(res.status === 1) {
       let pageInfo = res.data.data ? res.data.data : {page: 1,total_count: 0,total_page: 0}
       this.setState({bankList:res.data.list,pageInfo: pageInfo,loading:false})
-    } else message.error(res.msg)
+    } else {
+      message.error(res.msg)
+      this.setState({loading:false})
+    }
   }
   // 搜索
   handleSearch = (e) => {
@@ -109,13 +112,13 @@ export default class BankList extends Component {
       </div>
     )
     return (
-      <div className="member-behavior">
+      <div className="doc">
         <div className="card">
           <div className="card-head">
             <Form layout="inline" onSubmit={this.handleSearch}>
               <Item label="银行名称"><Input placeholder="银行名称" style={{width:'300px'}} value={searchForm.bankName} onChange={(e)=>this.handleChange('bankName',e)}/></Item>
               <Item><Button type="primary" htmlType="submit">搜索</Button></Item>
-              <Item><Button type="primary" onClick={()=>this.setState({addVisible:true,operType:'add'})}>添加银行</Button></Item>
+              <Item><Button type="primary" onClick={()=>this.setState({addBankName:'',imageUrl:'',addVisible:true,operType:'add'})}>添加银行</Button></Item>
             </Form>
           </div>
           <div className="card-body">

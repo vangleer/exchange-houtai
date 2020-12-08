@@ -30,13 +30,16 @@ export default class StatisticsSum extends Component {
     if(res.status === 1) {
       // 保存数据
       this.setState({financialStatisticsList:res.data,loading:false})
-    } else message.error(res.msg)
+    } else {
+      message.error(res.msg)
+      this.setState({loading:false})
+    }
   }
   
   render() {
     const {financialStatisticsList,columns,loading} = this.state
     return (
-      <div className="member-behavior">
+      <div className="doc">
         <div className="card">
           <Item><Button type="primary" onClick={this.getStatisticsSumList}>刷新</Button></Item>
           <div className="card-body">
